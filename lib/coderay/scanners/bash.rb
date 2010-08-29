@@ -140,8 +140,9 @@ module CodeRay::Scanners
           elsif match = scan(/[^ \$"'`\d]/)
             kind = :plain
           elsif match = scan(/.+/)
-            # this shouldn't be
-            kind = :reserved
+            # this shouldn't be :reserved for highlighting bad matches
+            #kind = :reserved
+            kind = :plain
           end
         elsif state == :quote
           if (match = scan(/\\./))
