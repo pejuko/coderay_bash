@@ -13,7 +13,7 @@ Bash scanner for highlighting scripts with CodeRay
     plain = File.read('some_script.sh')
     @body = CodeRay.scan(plain, :bash).div
 
-### in your template then do some thing like
+### in your template then do something like
 
     <%= @body %>
 
