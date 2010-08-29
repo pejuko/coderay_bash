@@ -1,6 +1,10 @@
 Bash scanner for highlighting scripts with CodeRay
 ==================================================
 
+### Instalation
+
+    gem install coderay_bash
+
 ### Usage
 
     require 'rubygems'
