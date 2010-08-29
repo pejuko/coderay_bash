@@ -17,4 +17,4 @@ Bash scanner for highlighting scripts with CodeRay
 
     <%= @body %>
 
-For more information see [CodeRay we pages](http://coderay.rubychan.de/)
+For more information see [CodeRay web pages](http://coderay.rubychan.de/)
