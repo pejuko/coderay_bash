@@ -1,4 +1,4 @@
-Bash scanner for highlighting scripts with coderay
+Bash scanner for highlighting scripts with CodeRay
 ==================================================
 
 ### Usage
