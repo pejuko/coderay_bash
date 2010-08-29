@@ -13,7 +13,7 @@ spec = Gem::Specification.new do |s|
   s.email = "pejuko@gmail.com"
   s.authors = ["Petr Kovar"]
   s.name = 'coderay_bash'
-  s.version = '0.1.1'
+  s.version = '0.1.2'
   s.date = Time.now.strftime("%Y-%m-%d")
   s.add_dependency('coderay', '< 1.0')
   s.require_path = 'lib'
