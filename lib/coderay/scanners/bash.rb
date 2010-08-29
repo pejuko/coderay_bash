@@ -1,6 +1,7 @@
 # Scanner for Bash
 # Author: Petr Kovar <pejuko@gmail.com>
-module CodeRay::Scanners
+module CodeRay
+module Scanners
   class Bash < Scanner
 
     register_for :bash
@@ -21,8 +22,6 @@ module CodeRay::Scanners
       local logout printf read set shopt source type typeset ulimit unalias
     )
 
-    RESERVED = RESERVED_WORDS + COMMANDS + BASH_COMMANDS
-
     VARIABLES = %w(
       CDPATH HOME IFS MAIL MAILPATH OPTARG OPTIND PATH PS1 PS2
     )
@@ -41,7 +40,14 @@ module CodeRay::Scanners
       RANDOM REPLAY SECONDS SHELL SHELLOPTS SHLVL TIMEFORMAT TMOUT TMPDIR UID
     )
 
-    CONSTANTS = VARIABLES + BASH_VARIABLES
+    PRE_CONSTANTS = / \$\{? (?: \# | \? | \d | \* | @ | - | \$ | \! | _ ) \}? /ox
+
+    IDENT_KIND = WordList.new(:ident).
+      add(RESERVED_WORDS, :reserved).
+      add(COMMANDS, :method).
+      add(BASH_COMMANDS, :method).
+      add(VARIABLES, :pre_type).
+      add(BASH_VARIABLES, :pre_type)
 
     def scan_tokens tokens, options
 
@@ -68,16 +74,16 @@ module CodeRay::Scanners
           elsif match = scan(/(?:"|`)/)
             state = :quote
             quote = match
-            tokens << [match, :plain]
             tokens << [:open, :string] if quote == '"'
             tokens << [:open, :shell] if quote == '`'
+            tokens << [match, :delimiter]
             next
           elsif match = scan(/'[^']*'/)
             kind = :string
           elsif match = scan(/(?: \& | > | < | \| >> | << | >\& )/ox)
             kind = :bin
-          elsif match = scan(/\d+\.(?:\d+\.?)+/)
-            #version
+          elsif match = scan(/\d+[\.-](?:\d+[\.-]?)+/)
+            #versions, dates, and hyphen delimited numbers
             kind = :float
           elsif match = scan(/\d+\.\d+\s+/)
             kind = :float
@@ -86,12 +92,12 @@ module CodeRay::Scanners
           elsif match = scan(/ (?: \$\(\( | \)\) ) /x)
             kind = :global_variable
           elsif match = scan(/ \$\{ [^\}]+ \} /ox)
-            kind = :instance_variable
             match =~ /\$\{(.*)\}/
-            kind = :pre_type if CONSTANTS.include?($1)
+            kind = IDENT_KIND[$1]
+            kind = :instance_variable if kind == :ident
           elsif match = scan(/ \$\( [^\)]+ \) /ox)
             kind = :shell
-          elsif match = scan(/ \$\{? (?: \# | \? | \d | \* | @ | - | \$ | \! | _ ) \}? /ox)
+          elsif match = scan(PRE_CONSTANTS)
             kind = :pre_constant
           elsif match = scan(/[^\s]*[A-Za-z_][A-Za-z_0-9]*\+?=/)
             match =~ /(.*?)([A-Za-z_][A-Za-z_0-9]*)(\+?=)/
@@ -100,24 +106,23 @@ module CodeRay::Scanners
             op = $3
             kind = :plain
             if str.to_s.strip.empty?
-              kind = :instance_variable
-              kind = :pre_type if CONSTANTS.include?(pre)
-              #kind = :pre_constant if CONSTANTS.include?(pre)
+              kind = IDENT_KIND[pre]
+              kind = :instance_variable if kind == :ident
               tokens << [pre, kind]
               tokens << [op, :operator]
               next
             end
           elsif match = scan(/[A-Za-z_]+\[[A-Za-z_\d]+\]/)
             # array
-            kind = :instance_variable
-            kind = :pre_type if CONSTANTS.include?(match)
+            kind = IDENT_KIND(match)
+            kind = :instance_variable if kind == :ident
           elsif match = scan(/ \$[A-Za-z_][A-Za-z_0-9]* /ox)
-            kind = :instance_variable
             match =~ /\$(.*)/
-            kind = :pre_type if CONSTANTS.include?($1)
+            kind = IDENT_KIND[$1]
+            kind = :instance_variable if kind == :ident
           elsif match = scan(/read \S+/)
             match =~ /read(\s+)(\S+)/
-            tokens << ['read', :reserved]
+            tokens << ['read', :method]
             tokens << [$1, :space]
             tokens << [$2, :instance_variable]
             next
@@ -125,13 +130,11 @@ module CodeRay::Scanners
             kind = :reserved
           elsif match = scan(/ [A-Za-z_][A-Za-z_\d]*;? /x)
             match =~ /([^;]+);?/
-            if RESERVED.include?($1)
-              if match[/([^;]+);$/]
-                tokens << [$1, :reserved]
-                tokens << [';', :delimiter]
-                next
-              end
-              kind = :reserved
+            kind = IDENT_KIND[$1]
+            if match[/([^;]+);$/]
+              tokens << [$1, kind]
+              tokens << [';', :delimiter]
+              next
             end
           elsif match = scan(/(?: = | - | \+ | \{ | \} | \( | \) | && | \|\| | ;; | ! )/ox)
             kind = :operator
@@ -141,20 +144,25 @@ module CodeRay::Scanners
             kind = :plain
           elsif match = scan(/.+/)
             # this shouldn't be :reserved for highlighting bad matches
-            #kind = :reserved
-            kind = :plain
+            kind = :error
+            match = ">>>>>#{match}<<<<<"
           end
         elsif state == :quote
-          if (match = scan(/\\./))
+          if (match = scan(/\\.?/))
             kind = :content
           elsif match = scan(/#{quote}/)
+            tokens << [match, :delimiter]
             tokens << [:close, :string] if quote == '"'
             tokens << [:close, :shell] if quote == "`"
             quote = nil
             state = :initial
-            kind = :plain
-          elsif match = scan(/ (?: \$\{?[A-Za-z_][A-Za-z_\d]*\}? | \$\{?(?:\#|\?|\d)\}? ) /x)
-            kind = :instance_variable
+            next
+            #kind = :symbol
+          elsif match = scan(PRE_CONSTANTS)
+            kind = :pre_constant
+          elsif match = scan(/ \$\{?[A-Za-z_][A-Za-z_\d]*\}? /x)
+            kind = IDENT_KIND[match]
+            kind = :instance_variable if kind == :ident
           elsif (quote == '`') and (match = scan(/\$"/))
             kind = :content
           elsif (quote == '"') and (match = scan(/\$`/))
@@ -163,7 +171,10 @@ module CodeRay::Scanners
             kind = :content
           else match = scan(/.+/)
             # this shouldn't be
-            kind = :reserved
+            #kind = :reserved
+            #raise match
+            match = ">>>>>#{match}<<<<<"
+            kind = :error
           end
         end
   
@@ -175,4 +186,5 @@ module CodeRay::Scanners
     end
 
   end
+end
 end
