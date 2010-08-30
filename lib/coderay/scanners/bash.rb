@@ -63,7 +63,9 @@ module Scanners
         end
 
         if state == :initial
-          if match = scan(/#.*/)
+          if  match = scan(/\A#!.*/)
+            kind = :directive
+          elsif match = scan(/#.*/)
             kind = :comment
           elsif match = scan(/(?:\. |source ).*/)
             kind = :reserved
