@@ -23,7 +23,7 @@ spec = Gem::Specification.new do |s|
 This gem was tested with coderay 0.9.3 and won't work with coderay from svn.
 EOF
   s.description = <<EOF
-This gem was tested with coderay 0.9.3 and won't work with coderay from svn.
+Bash highlighting for coderay. This gem was tested with coderay 0.9.3 and won't work with coderay from svn.
 EOF
 end
 
