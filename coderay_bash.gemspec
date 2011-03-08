@@ -13,7 +13,7 @@ spec = Gem::Specification.new do |s|
   s.email = "pejuko@gmail.com"
   s.authors = ["Petr Kovar"]
   s.name = 'coderay_bash'
-  s.version = '0.1.3'
+  s.version = '0.2.0'
   s.date = Time.now.strftime("%Y-%m-%d")
   s.add_dependency('coderay', '< 1.0')
   s.require_path = 'lib'
@@ -23,7 +23,7 @@ spec = Gem::Specification.new do |s|
 This gem was tested with coderay 0.9.3 and won't work with coderay from svn.
 EOF
   s.description = <<EOF
-Bash highlighting for coderay. This gem was tested with coderay 0.9.3 and won't work with coderay from svn.
+Bash highlighting for coderay. This gem was tested with coderay 0.9.3 and won't work with coderay >= 1.0.
 EOF
 end
 
