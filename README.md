@@ -17,4 +17,9 @@ Bash scanner for highlighting scripts with CodeRay
 
     <%= @body %>
 
+### Types
+
+* `:bash`
+* `:erb_bash` -- erb code in bash strings
+
 For more information see [CodeRay web pages](http://coderay.rubychan.de/)

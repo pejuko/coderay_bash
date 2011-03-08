@@ -5,10 +5,16 @@
 $KCODE='UTF8'
 
 require 'rake/gempackagetask'
+require 'rake/testtask'
 require 'rake/clean'
 
 CLEAN << "coverage" << "pkg" << "README.html" << "CHANGELOG.html"
 
-task :default => [:gem]
+task :default => [:test, :gem]
 Rake::GemPackageTask.new(eval(File.read("coderay_bash.gemspec"))) {|pkg|}
+
+Rake::TestTask.new(:test) do |t|
+  t.pattern = File.join(File.dirname(__FILE__), 'test/test.rb')
+  t.verbose = true
+end
 

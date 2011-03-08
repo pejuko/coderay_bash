@@ -49,10 +49,15 @@ module Scanners
       add(VARIABLES, :pre_type).
       add(BASH_VARIABLES, :pre_type)
 
-    def scan_tokens tokens, options
+    attr_reader :state, :quote
 
-      state = :initial
-      quote = nil
+    def initialize(*args)
+      super(*args)
+      @state = :initial
+      @quote = nil
+    end
+
+    def scan_tokens tokens, options
 
       until eos?
         kind = match = nil
@@ -62,7 +67,7 @@ module Scanners
           next
         end
 
-        if state == :initial
+        if @state == :initial
           if  match = scan(/\A#!.*/)
             kind = :directive
           elsif match = scan(/#.*/)
@@ -74,10 +79,10 @@ module Scanners
           elsif match = scan(/;/)
             kind = :delimiter
           elsif match = scan(/(?:"|`)/)
-            state = :quote
-            quote = match
-            tokens << [:open, :string] if quote == '"'
-            tokens << [:open, :shell] if quote == '`'
+            @state = :quote
+            @quote = match
+            tokens << [:open, :string] if @quote == '"'
+            tokens << [:open, :shell] if @quote == '`'
             tokens << [match, :delimiter]
             next
           elsif match = scan(/'[^']*'/)
@@ -149,15 +154,15 @@ module Scanners
             kind = :error
             match = ">>>>>#{match}<<<<<"
           end
-        elsif state == :quote
+        elsif @state == :quote
           if (match = scan(/\\.?/))
             kind = :content
-          elsif match = scan(/#{quote}/)
+          elsif match = scan(/#{@quote}/)
             tokens << [match, :delimiter]
-            tokens << [:close, :string] if quote == '"'
-            tokens << [:close, :shell] if quote == "`"
-            quote = nil
-            state = :initial
+            tokens << [:close, :string] if @quote == '"'
+            tokens << [:close, :shell] if @quote == "`"
+            @quote = nil
+            @state = :initial
             next
             #kind = :symbol
           elsif match = scan(PRE_CONSTANTS)
@@ -165,11 +170,11 @@ module Scanners
           elsif match = scan(/ \$\{?[A-Za-z_][A-Za-z_\d]*\}? /x)
             kind = IDENT_KIND[match]
             kind = :instance_variable if kind == :ident
-          elsif (quote == '`') and (match = scan(/\$"/))
+          elsif (@quote == '`') and (match = scan(/\$"/))
             kind = :content
-          elsif (quote == '"') and (match = scan(/\$`/))
+          elsif (@quote == '"') and (match = scan(/\$`/))
             kind = :content
-          elsif match = scan(/[^#{quote}\$\\]+/)
+          elsif match = scan(/[^#{@quote}\$\\]+/)
             kind = :content
           else match = scan(/.+/)
             # this shouldn't be

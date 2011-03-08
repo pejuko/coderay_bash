@@ -1,0 +1,6 @@
+v0.2.0
+------
+
+* the bash scanner can be use in combination with other scanners
+* new type added :erb_bash -- erb code in bash strings (thx to codez.ch)
+
