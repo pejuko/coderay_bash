@@ -63,7 +63,7 @@ class TestErbBash < Test::Unit::TestCase
          ["other_command", :ident],
          ["\n", :end_line]
          ],
-         CodeRay.scan(File.read(eb_file), :erb_bash)  )
+         CodeRay.scan(File.read(eb_file), :erb_bash, :ignore_errors => false))
   end
 
   def test_0011_ErbBash_Ignoring_Errors
@@ -115,7 +115,7 @@ class TestErbBash < Test::Unit::TestCase
          ["other_command", :ident],
          ["\n", :end_line]
          ],
-        CodeRay.scan(File.read(eb_file), :erb_bash, :ignore_errors => true))
+        CodeRay.scan(File.read(eb_file), :erb_bash))
   end
 
 end

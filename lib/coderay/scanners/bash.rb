@@ -192,7 +192,8 @@ module Scanners
   
   
     def handle_error(match, options)
-      if options[:ignore_errors]
+      o = {:ignore_errors => true}.merge(options)
+      if o[:ignore_errors]
         [match, :plain]
       else
         [">>>>>#{match}<<<<<", :error]        
