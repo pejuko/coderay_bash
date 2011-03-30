@@ -151,8 +151,7 @@ module Scanners
             kind = :plain
           elsif match = scan(/.+/)
             # this shouldn't be :reserved for highlighting bad matches
-            kind = :error
-            match = ">>>>>#{match}<<<<<"
+            match, kind = handle_error(match, options)
           end
         elsif @state == :quote
           if (match = scan(/\\.?/))
@@ -179,9 +178,8 @@ module Scanners
           else match = scan(/.+/)
             # this shouldn't be
             #kind = :reserved
-            #raise match
-            match = ">>>>>#{match}<<<<<"
-            kind = :error
+            #raise match 
+            match, kind = handle_error(match, options)
           end
         end
   
@@ -190,6 +188,15 @@ module Scanners
       end
 
       tokens
+    end
+  
+  
+    def handle_error(match, options)
+      if options[:ignore_errors]
+        [match, :plain]
+      else
+        [">>>>>#{match}<<<<<", :error]        
+      end
     end
 
   end

@@ -11,7 +11,7 @@ module CodeRay
       def setup
         super
         # Scan Bash instead of HTML template
-        @html_scanner = CodeRay.scanner :bash, :tokens => @tokens, :keep_tokens => true
+        @html_scanner = CodeRay.scanner :bash, @options.merge(:tokens => @tokens, :keep_tokens => true)
       end
     end
   end
