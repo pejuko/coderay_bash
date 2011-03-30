@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # vi: fenc=utf-8:expandtab:ts=2:sw=2:sts=2
 
-$KCODE='UTF8'
+$KCODE='UTF8' if RUBY_VERSION < "1.9"
 
 require 'test/unit'
 require 'rubygems'
