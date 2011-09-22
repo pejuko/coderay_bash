@@ -10,7 +10,7 @@ require 'pp'
 $current_dir = File.expand_path(File.dirname(__FILE__))
 $:.unshift File.expand_path(File.join($current_dir, ".."))
 
-require 'coderay'
+gem "coderay", "<1.0"
 require 'lib/coderay_bash'
 
 class TestErbBash < Test::Unit::TestCase
