@@ -23,6 +23,14 @@ module CodeRay module Scanners
       local logout printf read set shopt source type typeset ulimit unalias
     )
 
+    PROGRAMS = %w(
+      awk bash bunzip2 bzcat bzip2 cat chgrp chmod chown cp cut date dd df dir dmesg du ed egrep
+      false fgrep findmnt fusermount gawk grep groups gunzip gzip hostname install keyctl kill less
+      ln loadkeys login ls lsblk lsinitcpio lsmod mbchk mkdir mkfifo mknod more mount mountpoint mv
+      netstat pidof ping ping6 ps pwd readlink red rm rmdir sed sh shred sleep stty su sudo sync tar
+      touch  tput tr traceroute traceroute6 true umount uname uncompress vdir zcat
+    )
+
     VARIABLES = %w(
       CDPATH HOME IFS MAIL MAILPATH OPTARG OPTIND PATH PS1 PS2
     )
@@ -47,6 +55,7 @@ module CodeRay module Scanners
       add(RESERVED_WORDS, :reserved).
       add(COMMANDS, :method).
       add(BASH_COMMANDS, :method).
+      add(PROGRAMS, :method).
       add(VARIABLES, :pre_type).
       add(BASH_VARIABLES, :pre_type)
 
