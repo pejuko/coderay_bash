@@ -56,8 +56,8 @@ module CodeRay module Scanners
       add(COMMANDS, :method).
       add(BASH_COMMANDS, :method).
       add(PROGRAMS, :method).
-      add(VARIABLES, :pre_type).
-      add(BASH_VARIABLES, :pre_type)
+      add(VARIABLES, :predefined).
+      add(BASH_VARIABLES, :predefined)
 
     attr_reader :state, :quote
 
@@ -126,7 +126,7 @@ module CodeRay module Scanners
           elsif match = scan(/ \$\( [^\)]+ \) /ox)
             kind = :shell
           elsif match = scan(PRE_CONSTANTS)
-            kind = :pre_constant
+            kind = :predefined_constant
           elsif match = scan(/[^\s'"]*[A-Za-z_][A-Za-z_0-9]*\+?=/)
             match =~ /(.*?)([A-Za-z_][A-Za-z_0-9]*)(\+?=)/
             str = $1
@@ -185,7 +185,7 @@ module CodeRay module Scanners
             next
             #kind = :symbol
           elsif match = scan(PRE_CONSTANTS)
-            kind = :pre_constant
+            kind = :predefined_constant
           elsif match = scan(/ (?: \$\(\(.*?\)\) ) /x)
             kind = :global_variable
           elsif match = scan(/ \$\{?[A-Za-z_][A-Za-z_\d]*\}? /x)
