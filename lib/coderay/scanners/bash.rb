@@ -55,7 +55,7 @@ module CodeRay module Scanners
       add(RESERVED_WORDS, :reserved).
       add(COMMANDS, :method).
       add(BASH_COMMANDS, :method).
-      add(PROGRAMS, :method).
+#      add(PROGRAMS, :method).
       add(VARIABLES, :predefined).
       add(BASH_VARIABLES, :predefined)
 
