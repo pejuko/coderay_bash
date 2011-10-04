@@ -1,10 +1,10 @@
 # Scanner for Bash
 # Author: spam+github@codez.ch
-require 'coderay/scanners/rhtml'
+require 'coderay/scanners/erb'
 
 module CodeRay
   module Scanners
-    class ErbBash < RHTML
+    class ErbBash < ERB
       register_for :erb_bash
 
       protected

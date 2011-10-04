@@ -1,7 +1,8 @@
 # Scanner for Bash
 # Author: Petr Kovar <pejuko@gmail.com>
-module CodeRay
-module Scanners
+
+module CodeRay module Scanners
+
   class Bash < Scanner
 
     register_for :bash
@@ -84,11 +85,15 @@ module Scanners
           elsif match = scan(/"/)
             @state = :quote
             @quote = match
-            tokens << [:open, :string]
+            tokens.begin_group :string
             tokens << [match, :delimiter]
             next
           elsif match = scan(/`/)
-            tokens << [@shell ? :close : :open, :shell]
+            if @shell
+              tokens.end_group :shell
+            else
+              tokens.begin_group :shell
+            end
             @shell = (not @shell)
             tokens << [match, :delimiter]
             next
@@ -165,7 +170,7 @@ module Scanners
             kind = :content
           elsif match = scan(/#{@quote}/)
             tokens << [match, :delimiter]
-            tokens << [:close, :string] if @quote == '"'
+            tokens.end_group :string
             @quote = nil
             @state = :initial
             next
