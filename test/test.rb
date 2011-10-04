@@ -10,112 +10,23 @@ require 'pp'
 $current_dir = File.expand_path(File.dirname(__FILE__))
 $:.unshift File.expand_path(File.join($current_dir, ".."))
 
-gem "coderay", "<1.0"
 require 'lib/coderay_bash'
 
 class TestErbBash < Test::Unit::TestCase
   def test_0010_ErbBash
     eb_file = File.join($current_dir, "erb_bash.sh")
     assert_equal(
-        [["#!/bin/sh", :directive],
-         ["\n", :end_line],
-         ["\n", :end_line],
-         ["perl", :ident],
-         [" ", :space],
-         ["-", :operator],
-         ["e", :ident],
-         ["'s/to=5/to=10/'", :string],
-         [" ", :space],
-         ["/", :plain],
-         ["test", :method],
-         ["/", :plain],
-         ["file", :ident],
-         ["\n", :end_line],
-         ["echo", :method],
-         [" ", :space],
-         [:open, :string],
-         ["\"", :delimiter],
-         ["Parsed at ", :content],
-         [:open, :inline],
-         ["<%=", :inline_delimiter],
-         [" ", :space],
-         ["Time", :constant],
-         [".", :operator],
-         ["now", :ident],
-         [" ", :space],
-         ["%>", :inline_delimiter],
-         [:close, :inline],
-         ["\"", :delimiter],
-         [:close, :string],
-         ["\n", :end_line],
-         ["echo", :method],
-         [" ", :space],
-         [:open, :string],
-         ["\"", :delimiter],
-         ["Executed at `Date`", :content],
-         ["\"", :delimiter],
-         [:close, :string],
-         ["\n", :end_line],
-         ["command", :method],
-         [" ", :space],
-         [">>>>>'open quote<<<<<", :error],
-         ["\n", :end_line], 
-         ["other_command", :ident],
-         ["\n", :end_line]
-         ],
-         CodeRay.scan(File.read(eb_file), :erb_bash, :ignore_errors => false))
+      ["#!/bin/sh", :directive, "\n", :end_line, "\n", :end_line, "perl", :ident, " ", :space, "-", :operator, "e", :ident, "'s/to=5/to=10/'", :string, " ", :space, "/", :plain, "test", :method, "/", :plain, "file", :ident, "\n", :end_line, "echo", :method, " ", :space, :begin_group, :string, "\"", :delimiter, "Parsed at ", :content, :begin_group, :inline, "<%=", :inline_delimiter, " ", :space, "Time", :constant, ".", :operator, "now", :ident, " ", :space, "%>", :inline_delimiter, :end_group, :inline, "\"", :delimiter, :end_group, :string, "\n", :end_line, "echo", :method, " ", :space, :begin_group, :string, "\"", :delimiter, "Executed at `Date`", :content, "\"", :delimiter, :end_group, :string, "\n", :end_line, "command", :method, " ", :space, ">>>>>'open quote<<<<<", :error, "\n", :end_line, "other_command", :ident, "\n", :end_line],
+      CodeRay.scan(File.read(eb_file), :erb_bash, :ignore_errors => false).tokens
+    )
   end
 
   def test_0011_ErbBash_Ignoring_Errors
     eb_file = File.join($current_dir, "erb_bash.sh")
-    assert_equal( 
-        [["#!/bin/sh", :directive],
-         ["\n", :end_line],
-         ["\n", :end_line],
-         ["perl", :ident],
-         [" ", :space],
-         ["-", :operator],
-         ["e", :ident],
-         ["'s/to=5/to=10/'", :string],
-         [" ", :space],
-         ["/", :plain],
-         ["test", :method],
-         ["/", :plain],
-         ["file", :ident],
-         ["\n", :end_line],
-         ["echo", :method],
-         [" ", :space],
-         [:open, :string],
-         ["\"", :delimiter],
-         ["Parsed at ", :content],
-         [:open, :inline],
-         ["<%=", :inline_delimiter],
-         [" ", :space],
-         ["Time", :constant],
-         [".", :operator],
-         ["now", :ident],
-         [" ", :space],
-         ["%>", :inline_delimiter],
-         [:close, :inline],
-         ["\"", :delimiter],
-         [:close, :string],
-         ["\n", :end_line],
-         ["echo", :method],
-         [" ", :space],
-         [:open, :string],
-         ["\"", :delimiter],
-         ["Executed at `Date`", :content],
-         ["\"", :delimiter],
-         [:close, :string],
-         ["\n", :end_line],
-         ["command", :method],
-         [" ", :space],
-         ["'open quote", :plain],
-         ["\n", :end_line],
-         ["other_command", :ident],
-         ["\n", :end_line]
-         ],
-        CodeRay.scan(File.read(eb_file), :erb_bash))
+    assert_equal(
+      ["#!/bin/sh", :directive, "\n", :end_line, "\n", :end_line, "perl", :ident, " ", :space, "-", :operator, "e", :ident, "'s/to=5/to=10/'", :string, " ", :space, "/", :plain, "test", :method, "/", :plain, "file", :ident, "\n", :end_line, "echo", :method, " ", :space, :begin_group, :string, "\"", :delimiter, "Parsed at ", :content, :begin_group, :inline, "<%=", :inline_delimiter, " ", :space, "Time", :constant, ".", :operator, "now", :ident, " ", :space, "%>", :inline_delimiter, :end_group, :inline, "\"", :delimiter, :end_group, :string, "\n", :end_line, "echo", :method, " ", :space, :begin_group, :string, "\"", :delimiter, "Executed at `Date`", :content, "\"", :delimiter, :end_group, :string, "\n", :end_line, "command", :method, " ", :space, "'open quote", :plain, "\n", :end_line, "other_command", :ident, "\n", :end_line],
+      CodeRay.scan(File.read(eb_file), :erb_bash).tokens
+    )
   end
 
 end
