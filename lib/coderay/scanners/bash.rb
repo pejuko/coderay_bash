@@ -121,7 +121,14 @@ module CodeRay module Scanners
             kind = :global_variable
           elsif match = scan(/ \$\{ [^\}]+ \} /ox)
             match =~ /\$\{(.*)\}/
-            kind = IDENT_KIND[$1]
+            var=$1
+            if var =~ /\[.*\]/
+              encoder.text_token("${", :instance_variable)
+              match_array(var, encoder)
+              encoder.text_token("}", :instance_variable)
+              next
+            end
+            kind = IDENT_KIND[var]
             kind = :instance_variable if kind == :ident
           elsif match = scan(/ \$\( [^\)]+ \) /ox)
             kind = :shell
@@ -140,10 +147,10 @@ module CodeRay module Scanners
               encoder.text_token(op, :operator)
               next
             end
-          elsif match = scan(/[A-Za-z_]+\[[A-Za-z_\d]+\]/)
+          elsif match = scan(/[A-Za-z_]+\[[A-Za-z_\@\*\d]+\]/)
             # array
-            kind = IDENT_KIND(match)
-            kind = :instance_variable if kind == :ident
+            match_array(match, encoder)
+            next
           elsif match = scan(/ \$[A-Za-z_][A-Za-z_0-9]* /ox)
             match =~ /\$(.*)/
             kind = IDENT_KIND[$1]
@@ -188,7 +195,17 @@ module CodeRay module Scanners
             kind = :predefined_constant
           elsif match = scan(/ (?: \$\(\(.*?\)\) ) /x)
             kind = :global_variable
-          elsif match = scan(/ \$\{?[A-Za-z_][A-Za-z_\d]*\}? /x)
+          elsif match = scan(/ \$ (?: (?: \{ [^\}]* \}) | (?: [A-Za-z_0-9]+ ) ) /x)
+            match =~ /(\$\{?)([^\}]*)(\}?)/
+            pre=$1
+            var=$2
+            post=$3
+            if var =~ /\[.*?\]/
+              encoder.text_token(pre,:instance_variable)
+              match_array(var, encoder)
+              encoder.text_token(post,:instance_variable)
+              next
+            end
             kind = IDENT_KIND[match]
             kind = :instance_variable if kind == :ident
           elsif match = scan(/[^#{@quote}\\]+/)
@@ -208,6 +225,18 @@ module CodeRay module Scanners
       encoder
     end
   
+
+    def match_array(match, encoder)
+        match =~ /([A-Za-z_]+)\[(.*?)\]/
+        var = $1
+        key = $2
+        kind = IDENT_KIND[var]
+        kind = :instance_variable if kind == :ident
+        encoder.text_token(var, kind)
+        encoder.text_token("[", :operator)
+        encoder.text_token(key, :key)
+        encoder.text_token("]", :operator)
+    end
   
     def handle_error(match, options)
       o = {:ignore_errors => true}.merge(options)
