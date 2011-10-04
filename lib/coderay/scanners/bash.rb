@@ -59,13 +59,13 @@ module CodeRay module Scanners
       @shell = false
     end
 
-    def scan_tokens tokens, options
+    def scan_tokens encoder, options
 
       until eos?
         kind = match = nil
 
         if match = scan(/\n/)
-          tokens << [match, :end_line]
+          encoder.text_token(match, :end_line)
           next
         end
 
@@ -85,17 +85,17 @@ module CodeRay module Scanners
           elsif match = scan(/"/)
             @state = :quote
             @quote = match
-            tokens.begin_group :string
-            tokens << [match, :delimiter]
+            encoder.begin_group :string
+            encoder.text_token(match, :delimiter)
             next
           elsif match = scan(/`/)
             if @shell
-              tokens.end_group :shell
+              encoder.end_group :shell
             else
-              tokens.begin_group :shell
+              encoder.begin_group :shell
             end
             @shell = (not @shell)
-            tokens << [match, :delimiter]
+            encoder.text_token(match, :delimiter)
             next
           elsif match = scan(/'[^']*'/)
             kind = :string
@@ -127,8 +127,8 @@ module CodeRay module Scanners
             if str.to_s.strip.empty?
               kind = IDENT_KIND[pre]
               kind = :instance_variable if kind == :ident
-              tokens << [pre, kind]
-              tokens << [op, :operator]
+              encoder.text_token(pre, kind)
+              encoder.text_token(op, :operator)
               next
             end
           elsif match = scan(/[A-Za-z_]+\[[A-Za-z_\d]+\]/)
@@ -141,9 +141,9 @@ module CodeRay module Scanners
             kind = :instance_variable if kind == :ident
           elsif match = scan(/read \S+/)
             match =~ /read(\s+)(\S+)/
-            tokens << ['read', :method]
-            tokens << [$1, :space]
-            tokens << [$2, :instance_variable]
+            encoder.text_token('read', :method)
+            encoder.text_token($1, :space)
+            encoder.text_token($2, :instance_variable)
             next
           elsif match = scan(/[\!\:\[\]\{\}]/)
             kind = :reserved
@@ -151,8 +151,8 @@ module CodeRay module Scanners
             match =~ /([^;]+);?/
             kind = IDENT_KIND[$1]
             if match[/([^;]+);$/]
-              tokens << [$1, kind]
-              tokens << [';', :delimiter]
+              encoder.text_token($1, kind)
+              encoder.text_token(';', :delimiter)
               next
             end
           elsif match = scan(/(?: = | - | \+ | \{ | \} | \( | \) | && | \|\| | ;; | ! )/ox)
@@ -169,8 +169,8 @@ module CodeRay module Scanners
           if (match = scan(/\\.?/))
             kind = :content
           elsif match = scan(/#{@quote}/)
-            tokens << [match, :delimiter]
-            tokens.end_group :string
+            encoder.text_token(match, :delimiter)
+            encoder.end_group :string
             @quote = nil
             @state = :initial
             next
@@ -193,10 +193,10 @@ module CodeRay module Scanners
         end
   
         match ||= matched
-        tokens << [match, kind]
+        encoder.text_token(match, kind)
       end
 
-      tokens
+      encoder
     end
   
   
