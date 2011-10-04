@@ -1,3 +1,12 @@
+v1.0
+----
+
+* compatible with coderay 1.0
+* `` doesn't change state but sets @shell variable to true
+* support for arrays
+* fix comments
+
+
 v0.2.1
 ------
 
