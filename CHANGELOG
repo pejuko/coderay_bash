@@ -1,3 +1,10 @@
+v1.0.1
+------
+
+* fix open single quote
+* support for heredoc
+
+
 v1.0
 ----
 
