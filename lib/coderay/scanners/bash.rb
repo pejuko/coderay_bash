@@ -106,7 +106,7 @@ module CodeRay module Scanners
             @shell = (not @shell)
             encoder.text_token(match, :delimiter)
             next
-          elsif match = scan(/'[^']*'/)
+          elsif match = scan(/'[^']*'?/)
             kind = :string
           elsif match = scan(/(?: \& | > | < | \| >> | << | >\& )/ox)
             kind = :bin
@@ -220,6 +220,10 @@ module CodeRay module Scanners
   
         match ||= matched
         encoder.text_token(match, kind)
+      end
+
+      if @state == :quote
+        encoder.end_group :string 
       end
 
       encoder
