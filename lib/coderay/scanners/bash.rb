@@ -97,6 +97,13 @@ module CodeRay module Scanners
             encoder.begin_group :string
             encoder.text_token(match, :delimiter)
             next
+          elsif match = scan(/<<\S+/)
+            @state = :quote
+            match =~ /<<(\S+)/
+            @quote = "#{$1}"
+            encoder.begin_group :string
+            encoder.text_token(match, :delimiter)
+            next
           elsif match = scan(/`/)
             if @shell
               encoder.end_group :shell
