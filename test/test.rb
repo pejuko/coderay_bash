@@ -22,7 +22,7 @@ class TestErbBash < Test::Unit::TestCase
     )
   end
 
-  def test_0011_ErbBash_Ignoring_Errors
+  def test_0020_ErbBash_Ignoring_Errors
     eb_file = File.join($current_dir, "erb_bash.sh")
     assert_equal(
       #["#!/bin/sh", :directive, "\n", :end_line, "\n", :end_line, "perl", :ident, " ", :space, "-", :operator, "e", :ident, "'s/to=5/to=10/'", :string, " ", :space, "/", :plain, "test", :method, "/", :plain, "file", :ident, "\n", :end_line, "echo", :method, " ", :space, :begin_group, :string, "\"", :delimiter, "Parsed at ", :content, :begin_group, :inline, "<%=", :inline_delimiter, " ", :space, "Time", :constant, ".", :operator, "now", :ident, " ", :space, "%>", :inline_delimiter, :end_group, :inline, "\"", :delimiter, :end_group, :string, "\n", :end_line, "echo", :method, " ", :space, :begin_group, :string, "\"", :delimiter, "Executed at `Date`", :content, "\"", :delimiter, :end_group, :string, "\n", :end_line, "command", :method, " ", :space, "'open quote", :plain, "\n", :end_line, "other_command", :ident, "\n", :end_line],
@@ -31,10 +31,18 @@ class TestErbBash < Test::Unit::TestCase
     )
   end
 
-  def test_0011_ErbBash_Ignoring_Errors
+  def test_0030_heredoc
     file = File.join($current_dir, "heredoc.sh")
     assert_equal(
       ["#/bin/bash", :comment, "\n", :end_line, "\n", :end_line, "cat", :ident, " ", :space, :begin_group, :string, "<<EOF", :delimiter, "\n", :end_line, "little brown fox jumps over lazy dog\n ", :content, "EOF", :delimiter, :end_group, :string, "\n", :end_line, "\n", :end_line, "echo", :method, " ", :space, :begin_group, :string, "\"", :delimiter, "end", :content, "\"", :delimiter, :end_group, :string, "\n", :end_line],
+      CodeRay.scan(File.read(file), :bash).tokens
+    )
+  end
+
+  def test_0040_nested_shell
+    file = File.join($current_dir, "nested_shells.sh")
+    assert_equal(
+      ["blueberry", :instance_variable, "=", :operator, :begin_group, :shell, "$(", :delimiter, "date", :ident, " ", :space, "-", :operator, "d", :ident, " ", :space, :begin_group, :string, "\"", :delimiter, :begin_group, :shell, "$(", :delimiter, "stat -c ", :content, :begin_group, :shell, "$(", :delimiter, "%z", :content, ")", :delimiter, :end_group, :shell, " blueberry.exe", :content, ")", :delimiter, :end_group, :shell, "\"", :delimiter, :end_group, :string, ")", :delimiter, :end_group, :shell, "\n", :end_line],
       CodeRay.scan(File.read(file), :bash).tokens
     )
   end

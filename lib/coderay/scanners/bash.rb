@@ -66,6 +66,8 @@ module CodeRay module Scanners
       @state = :initial
       @quote = nil
       @shell = false
+      @brace_shell = 0
+      @quote_brace_shell = 0
     end
 
     def scan_tokens encoder, options
@@ -106,12 +108,13 @@ module CodeRay module Scanners
             next
           elsif match = scan(/`/)
             if @shell
+              encoder.text_token(match, :delimiter)
               encoder.end_group :shell
             else
               encoder.begin_group :shell
+              encoder.text_token(match, :delimiter)
             end
             @shell = (not @shell)
-            encoder.text_token(match, :delimiter)
             next
           elsif match = scan(/'[^']*'?/)
             kind = :string
@@ -137,8 +140,19 @@ module CodeRay module Scanners
             end
             kind = IDENT_KIND[var]
             kind = :instance_variable if kind == :ident
-          elsif match = scan(/ \$\( [^\)]+ \) /ox)
-            kind = :shell
+          #elsif match = scan(/ \$\( [^\)]+ \) /ox)
+          elsif match = scan(/ \$\( /ox)
+            @brace_shell += 1
+            encoder.begin_group :shell
+            encoder.text_token(match, :delimiter)
+            next
+          elsif match = scan(/ \) /ox)
+            if @brace_shell > 0
+              encoder.text_token(match, :delimiter)
+              encoder.end_group :shell
+              @brace_shell -= 1
+              next
+            end
           elsif match = scan(PRE_CONSTANTS)
             kind = :predefined_constant
           elsif match = scan(/[^\s'"]*[A-Za-z_][A-Za-z_0-9]*\+?=/)
@@ -202,6 +216,20 @@ module CodeRay module Scanners
             kind = :predefined_constant
           elsif match = scan(/ (?: \$\(\(.*?\)\) ) /x)
             kind = :global_variable
+          elsif match = scan(/ \$\( /ox)
+            encoder.begin_group :shell
+            encoder.text_token(match, :delimiter)
+            @quote_brace_shell += 1
+            next
+          elsif match = scan(/\)/)
+            if @quote_brace_shell > 0
+              encoder.text_token(match, :delimiter)
+              encoder.end_group :shell
+              @quote_brace_shell -= 1
+              next
+            else
+              kind = :content
+            end
           elsif match = scan(/ \$ (?: (?: \{ [^\}]* \}) | (?: [A-Za-z_0-9]+ ) ) /x)
             match =~ /(\$\{?)([^\}]*)(\}?)/
             pre=$1
@@ -215,7 +243,7 @@ module CodeRay module Scanners
             end
             kind = IDENT_KIND[match]
             kind = :instance_variable if kind == :ident
-          elsif match = scan(/[^#{@quote}\\]+/)
+          elsif match = scan(/[^\)\$#{@quote}\\]+/)
             kind = :content
           else match = scan(/.+/)
             # this shouldn't be
