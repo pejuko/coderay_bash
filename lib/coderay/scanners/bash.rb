@@ -85,7 +85,7 @@ module CodeRay module Scanners
             kind = :directive
           elsif match = scan(/\s*#.*/)
             kind = :comment
-          elsif match = scan(/.#/)
+          elsif match = scan(/[^"]#/)
             kind = :ident
           elsif match = scan(/(?:\. |source ).*/)
             kind = :reserved
