@@ -30,7 +30,7 @@ class TestErbBash < Test::Unit::TestCase
       CodeRay.scan(File.read(eb_file), :erb_bash).tokens
     )
   end
-
+    
   def test_0030_heredoc
     file = File.join($current_dir, "heredoc.sh")
     assert_equal(
@@ -44,6 +44,21 @@ class TestErbBash < Test::Unit::TestCase
     assert_equal(
       ["blueberry", :instance_variable, "=", :operator, :begin_group, :shell, "$(", :delimiter, "date", :ident, " ", :space, "-", :operator, "d", :ident, " ", :space, :begin_group, :string, "\"", :delimiter, :begin_group, :shell, "$(", :delimiter, "stat -c ", :content, :begin_group, :shell, "$(", :delimiter, "%z", :content, ")", :delimiter, :end_group, :shell, " blueberry.exe", :content, ")", :delimiter, :end_group, :shell, "\"", :delimiter, :end_group, :string, ")", :delimiter, :end_group, :shell, "\n", :end_line],
       CodeRay.scan(File.read(file), :bash).tokens
+    )
+  end
+  
+  def test_0050_ErbBash_to_html
+    eb_file = File.join($current_dir, "function.sh")
+    assert_nothing_raised {
+      CodeRay.scan(File.read(eb_file), :erb_bash, :ignore_errors => false).html
+    }
+  end
+  
+  def test_0060_Comments_in_strings
+    eb_file = File.join($current_dir, "string_comment.sh")
+    assert_equal(
+      ["echo", :method, " ", :space, :begin_group, :string, "\"", :delimiter, "#output a comment", :content, "\"", :delimiter, :end_group, :string, " ", :space, ">", :bin, " ", :space, "foo", :ident, "\n", :end_line, "echo", :method, " ", :space, :begin_group, :string, "\"", :delimiter, "more", :content, "\"", :delimiter, :end_group, :string, " ", :space, ">", :bin, ">", :bin, " ", :space, "foo", :ident, "  # so this is a comment now", :comment, "\n", :end_line],
+      CodeRay.scan(File.read(eb_file), :bash).tokens
     )
   end
 
