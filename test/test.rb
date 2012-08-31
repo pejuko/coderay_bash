@@ -30,7 +30,14 @@ class TestErbBash < Test::Unit::TestCase
       CodeRay.scan(File.read(eb_file), :erb_bash).tokens
     )
   end
-
+  
+  def test_0010_ErbBash_to_html
+    eb_file = File.join($current_dir, "function.sh")
+    assert_nothing_raised {
+      CodeRay.scan(File.read(eb_file), :erb_bash, :ignore_errors => false).html
+    }
+  end
+  
   def test_0030_heredoc
     file = File.join($current_dir, "heredoc.sh")
     assert_equal(
