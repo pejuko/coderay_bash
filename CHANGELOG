@@ -1,3 +1,10 @@
+v1.0.3
+------
+
+* fix function closing bracket (by codez)
+* fix # in string is not a comment (by codez)
+
+
 v1.0.2
 ------
 
