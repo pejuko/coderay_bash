@@ -81,7 +81,7 @@ class TestArray < Test::Unit::TestCase
   
   def test_0010_Array
     eb_file = File.join($current_dir, "json.sh")
-    assert_equal(["cat",:ident," ",:space,"$1",:predefined_constant," ",:space,"|",:plain," ",:space,"while",:reserved," ",:space,"read",:method," ",:space,"json;",:instance_variable," ",:space,"do",:reserved," ",:space,"if",:reserved," ",:space,"[",:reserved,"[",:reserved," ",:space,"${",:instance_variable,"array2",:instance_variable,"[",:operator,"0",:key,"]",:operator,"}",:instance_variable," ",:space,"=",:operator,"=",:operator," ",:space,"1",:integer," ",:space,"]",:reserved,"]",:reserved,";",:delimiter," ",:space,"then",:reserved,"\n",:end_line,"echo",:method," ",:space,"$json",:instance_variable," ",:space,"|",:plain," ",:space,".",:plain,".",:plain,".",:plain,".",:plain,".",:plain,".",:plain,"\n",:end_line],
+    assert_equal(["cat",:ident," ",:space,"$1",:predefined_constant," ",:space,"|",:plain," ",:space,"while",:reserved," ",:space,"read",:method," ",:space,"json;",:instance_variable," ",:space,"do",:reserved," ",:space,"if",:reserved," ",:space,"[",:reserved,"[",:reserved," ",:space,"${",:instance_variable,"array2",:instance_variable,"[",:operator,"0",:key,"]",:operator,"}",:instance_variable," ",:space,"=",:operator,"=",:operator," ",:space,"1",:integer," ",:space,"]",:reserved,"]",:reserved,";",:delimiter," ",:space,"then",:reserved,"\n",:end_line,"echo",:method," ",:space,"$json",:instance_variable," ",:space,"|",:plain," ",:space,"......",:plain,"\n",:end_line],
                  CodeRay.scan(File.read(eb_file), :bash).tokens)
   end
 
