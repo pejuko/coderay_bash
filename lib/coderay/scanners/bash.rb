@@ -264,7 +264,7 @@ module CodeRay module Scanners
   
 
     def match_array(match, encoder)
-        match =~ /([A-Za-z_]+)\[(.*?)\]/
+        match =~ /(.+)\[(.*?)\]/
         var = $1
         key = $2
         kind = IDENT_KIND[var]
