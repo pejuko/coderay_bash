@@ -1,3 +1,8 @@
+v1.0.5
+------
+
+* register .sh file extension with :bash scanner (by Alexandre Vezina)
+
 v1.0.4
 ------
 
