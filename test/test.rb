@@ -86,3 +86,14 @@ class TestArray < Test::Unit::TestCase
   end
 
 end
+
+
+class TestKeepPath < Test::Unit::TestCase
+  
+  def test_0010_Array
+    file = File.join($current_dir, "keep_path.sh")
+    assert_equal(["#!/bin/sh", :directive, "\n", :end_line, "\n", :end_line, "sudo", :ident, " ", :space, "qemu", :ident, "-", :operator, "kvm", :ident, " ", :space, "-", :operator, "m", :ident, " ", :space, "768", :integer, " ", :space, "\\", :plain, "\n", :end_line, "    ", :space, "-", :operator, "boot", :ident, " ", :space, "d", :ident, " ", :space, "\\", :plain, "\n", :end_line, "    ", :space, "-", :operator, "drive", :ident, " ", :space, "file", :instance_variable, "=", :operator, "/bak/kvm/salix.qcow,cache=", :plain, "writeback", :ident, " ", :space, "\\", :plain, "\n", :end_line, "    ", :space, "-", :operator, "cdrom", :ident, " ", :space, "/", :plain, "ntfs", :ident, "-", :operator, "d", :ident, "/", :plain, "ISO", :ident, "/", :plain, "salix64", :ident, "-", :operator, "openbox", :ident, "-", :operator, "14.1.", :float, "iso", :ident, " ", :space, "-", :operator, "vnc", :ident, " ", :space, ":", :reserved, "3", :integer, "\n", :end_line, "\n", :end_line],
+                 CodeRay.scan(File.read(file), :bash).tokens)
+  end
+
+end

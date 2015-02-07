@@ -155,7 +155,7 @@ module CodeRay module Scanners
             next
           elsif match = scan(PRE_CONSTANTS)
             kind = :predefined_constant
-          elsif match = scan(/[^\s'"]*[A-Za-z_][A-Za-z_0-9]*\+?=/)
+          elsif match = scan(/[^\s'"]*?[A-Za-z_][A-Za-z_0-9]*\+?=/)
             match =~ /(.*?)([A-Za-z_][A-Za-z_0-9]*)(\+?=)/
             str = $1
             pre = $2
