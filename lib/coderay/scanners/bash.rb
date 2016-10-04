@@ -28,7 +28,7 @@ module CodeRay module Scanners
       false fgrep findmnt fusermount gawk grep groups gunzip gzip hostname install keyctl kill less
       ln loadkeys login ls lsblk lsinitcpio lsmod mbchk mkdir mkfifo mknod more mount mountpoint mv
       netstat pidof ping ping6 ps pwd readlink red rm rmdir sed sh shred sleep stty su sudo sync tar
-      touch  tput tr traceroute traceroute6 true umount uname uncompress vdir zcat
+      touch  tput tr traceroute traceroute6 true umount uname uncompress vdir zcat curl wget
     )
 
     VARIABLES = %w(
